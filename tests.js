@@ -190,3 +190,51 @@ test('fuzy match', function(){
   transitionShouldBeCalled = true;
   machine.transitionTo('alpha')
 });
+
+test('DSL', function(){
+  expect(4);
+
+  var beforeWasRun,
+  afterWasRun,
+  machine = new StateMachine({
+    beforeTransitions: [
+      {
+        to: 'beta',
+        fn: function(){ ok(beforeWasRun); }
+      }
+    ],
+
+    afterTransitions: [
+      {
+        from: '*',
+        to: 'beta',
+        fn: function(){ ok(afterWasRun); }
+      }
+    ],
+
+    state: 'alpha',
+    states: {
+      alpha: {
+        sayHi: function() { return 'hi from alpha'; }
+      },
+      beta: {
+        sayHi: function() { return 'hi from beta'; }
+      }
+    }
+  });
+
+  beforeWasRun = true;
+  afterWasRun = true;
+
+  machine.transitionTo('beta');
+
+  beforeWasRun = false;
+  afterWasRun = false;
+
+  machine.transitionTo('alpha');
+
+  beforeWasRun = true;
+  afterWasRun = true;
+
+  machine.transitionTo('beta');
+});

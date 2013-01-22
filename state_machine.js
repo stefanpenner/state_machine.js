@@ -35,6 +35,20 @@ function StateMachine(options){
   this.state = options.state;
   this.states = options.states || {};
   this._subscriptions = {};
+
+  var beforeTransitions = (options.beforeTransitions ||[]);
+  var afterTransitions  = (options.afterTransitions ||[]);
+  var rule;
+
+  for(var i = 0, length = beforeTransitions.length; length > i; i++){
+    rule = beforeTransitions[i];
+    this.beforeTransition.call(this, rule.from, rule.to, rule.fn);
+  }
+
+  for(var i = 0, length = afterTransitions.length; length > i; i++){
+    rule = afterTransitions[i];
+    this.afterTransition.call(this, rule.from, rule.to, rule.fn);
+  }
 }
 
 StateMachine.SPLAT = SPLAT =  '*';
