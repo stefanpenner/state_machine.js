@@ -32,6 +32,10 @@ if (!Array.prototype.indexOf) {
 }
 
 function StateMachine(options){
+  if (!options.state) {
+    throw new Error('Missing initial state');
+  }
+
   this.state = options.state;
   this.states = options.states || {};
   this._subscriptions = {};
