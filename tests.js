@@ -158,3 +158,35 @@ test("unhandledEvent", function(){
 
   machine.send(originalEventName)
 });
+
+module('.beforeTransition');
+
+test('exact match', function(){
+  expect(1);
+  var machine = buildMachine()
+
+  machine.beforeTransition('alpha','beta', function(){
+    ok(transitionShouldBeCalled);
+  });
+
+  transitionShouldBeCalled = true;
+  machine.transitionTo('beta')
+
+  transitionShouldBeCalled = true;
+  machine.transitionTo('alpha')
+})
+
+test('regex match', function(){
+  expect(1);
+  var machine = buildMachine()
+
+  machine.beforeTransition('al.*','beta', function(){
+    ok(transitionShouldBeCalled);
+  });
+
+  transitionShouldBeCalled = true;
+  machine.transitionTo('beta')
+
+  transitionShouldBeCalled = true;
+  machine.transitionTo('alpha')
+})

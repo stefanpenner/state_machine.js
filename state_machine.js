@@ -51,6 +51,26 @@ StateMachine.prototype = {
     this.didTransition(previousState, nextState);
   },
 
+  beforeTransition: function(from, to, fn, fnContext) {
+    this._fuzzyTransition('willTransition', from, to, fn, fnContext);
+  },
+
+  afterTransition: function(from, to, fn, fnContext) {
+    this._fuzzyTransition('didTransition', from, to, fn, fnContext);
+  },
+
+  _fuzzyTransition: function(event, from, to, fn, fnContext) {
+    var context = fnContext || this,
+    fromRegExp = new RegExp('^'+from+'$'),
+    toRegExp = new RegExp('^'+to+'$');
+
+    this.on(event, function(from, to){
+      if (fromRegExp.test(from) && toRegExp.test(to)){
+        fn.call(context, from, to);
+      }
+    })
+  },
+
   willTransition: function(from, to) {
     this._notify('willTransition', from, to);
   },
