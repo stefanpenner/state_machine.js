@@ -37,6 +37,8 @@ function StateMachine(options){
   this._subscriptions = {};
 }
 
+StateMachine.SPLAT = SPLAT =  '*';
+
 StateMachine.prototype = {
   transitionTo: function(nextState){
     var state = this.states[nextState],
@@ -61,14 +63,23 @@ StateMachine.prototype = {
 
   _fuzzyTransition: function(event, from, to, fn, fnContext) {
     var context = fnContext || this,
-    fromRegExp = new RegExp('^'+from+'$'),
-    toRegExp = new RegExp('^'+to+'$');
+    from = from || SPLAT,
+    to   = to   || SPLAT,
 
-    this.on(event, function(from, to){
-      if (fromRegExp.test(from) && toRegExp.test(to)){
+    fromSplatOffset = from.indexOf(SPLAT),
+    toSplatOffset   = to.indexOf(SPLAT);
+
+    if (fromSplatOffset >= 0){ from = from.substr(fromSplatOffset, 0); }
+    if (toSplatOffset   >= 0){   to = to.substr(toSplatOffset, 0);     }
+
+    this.on(event, function(currentFrom, currentTo)  {
+      if (fromSplatOffset >= 0){ currentFrom = currentFrom.substr(fromSplatOffset, 0); }
+      if (toSplatOffset   >= 0){   currentTo = currentTo.substr(toSplatOffset, 0);     }
+
+      if(currentTo === to && currentFrom === from){
         fn.call(context, from, to);
       }
-    })
+    });
   },
 
   willTransition: function(from, to) {
@@ -112,7 +123,6 @@ StateMachine.prototype = {
     }else{
       this.unhandledEvent(eventName);
     }
-
   },
 
   unhandledEvent: function(event){

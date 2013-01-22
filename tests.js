@@ -174,13 +174,13 @@ test('exact match', function(){
 
   transitionShouldBeCalled = true;
   machine.transitionTo('alpha')
-})
+});
 
-test('regex match', function(){
+test('fuzy match', function(){
   expect(1);
   var machine = buildMachine()
 
-  machine.beforeTransition('al.*','beta', function(){
+  machine.beforeTransition('al*','beta', function(){
     ok(transitionShouldBeCalled);
   });
 
@@ -189,4 +189,4 @@ test('regex match', function(){
 
   transitionShouldBeCalled = true;
   machine.transitionTo('alpha')
-})
+});
