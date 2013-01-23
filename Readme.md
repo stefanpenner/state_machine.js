@@ -7,23 +7,25 @@ var transitionTo = SM.transitionTo;
 authPopup = new StateMachine({
   initialState: 'closed',
 
-  closed: {
-    signUpViaFacebook: transitionTo('signingUpViaFacebook'),
-    signUpViaEmail:    transitionTo('loggingInViaEmail'),
-    loginViaFacebook:  transitionTo('loggingInViaFacebook'),
-    loginViaEmail:     transitionTo('loggingInViaEmail'),
+  states: {
+    closed: {
+      signUpViaFacebook: transitionTo('signingUpViaFacebook'),
+      signUpViaEmail:    transitionTo('loggingInViaEmail'),
+      loginViaFacebook:  transitionTo('loggingInViaFacebook'),
+      loginViaEmail:     transitionTo('loggingInViaEmail'),
 
-    welcomeBack:       transitionTo('welcomingBack')
-  },
+      welcomeBack:       transitionTo('welcomingBack')
+    },
 
-  signingUpViaFacebook: { },
-  signingUpViaEmail:    { },
+    signingUpViaFacebook: { },
+    signingUpViaEmail:    { },
 
-  loggingInViaFacebook: { },
-  loggingInViaEmail:    { },
+    loggingInViaFacebook: { },
+    loggingInViaEmail:    { },
 
-  recoveringPassword:   { },
-  welcomingBack:        { }
+    recoveringPassword:   { },
+    welcomingBack:        { }
+  }
 });
 
 authPopup.beforeTransition({ from: '*',      to: 'closed' }, function(){ console.log('close window'); });
@@ -31,24 +33,26 @@ authPopup.afterTransition({  from: 'closed', to: '*'      }, function(){ console
 
 userState = new StateMachine({
   initialState: 'unknownUser',
-  unknownUser:{
-    openAuthDialog: function(){ authPopup.send('signupViaFacebook'); }
-  },
+  states: {
+    unknownUser:{
+      openAuthDialog: function(){ authPopup.send('signupViaFacebook'); }
+    },
 
-  isAuthenticated:{
-    openAuthDialog: function(){ authPopup.send('signingUpViaFacebook'); }
-  },
+    isAuthenticated:{
+      openAuthDialog: function(){ authPopup.send('signingUpViaFacebook'); }
+    },
 
-  isFacebookAuthenticated: {
-    openAuthDialog: function(){ authPopup.send('welcomBack'); }
-  },
+    isFacebookAuthenticated: {
+      openAuthDialog: function(){ authPopup.send('welcomBack'); }
+    },
 
-  hasFacebookConnected:{
-    openAuthDialog: function(){ authPopup.send('logInViaFacebook'); }
-  },
+    hasFacebookConnected:{
+      openAuthDialog: function(){ authPopup.send('logInViaFacebook'); }
+    },
 
-  hasEmailedAuthenticated: {
-    openAuthDialog: function(){ authPopup.send('logInViaEmail'); }
+    hasEmailedAuthenticated: {
+      openAuthDialog: function(){ authPopup.send('logInViaEmail'); }
+    }
   }
 });
 
