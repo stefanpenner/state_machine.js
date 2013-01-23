@@ -59,6 +59,7 @@ function StateMachine(options){
 }
 
 StateMachine.SPLAT = SPLAT =  '*';
+SM = StateMachine;
 
 StateMachine.prototype = {
   transitionTo: function(nextStateName){

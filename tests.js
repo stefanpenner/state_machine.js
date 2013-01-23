@@ -12,7 +12,10 @@ function buildMachine(){
   });
 }
 
-module("api");
+module('api');
+test('SM is StateMachine', function(){
+  equal(SM, StateMachine);
+});
 
 test("has states", function() {
   var machine = buildMachine()
