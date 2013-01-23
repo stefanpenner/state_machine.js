@@ -101,19 +101,23 @@ StateMachine.prototype = {
     var context = fnContext || this,
     from = options.from || SPLAT,
     to   = options.to   || SPLAT,
-
+    matchingFrom = from,
+    matchingTo  = to,
     fromSplatOffset = from.indexOf(SPLAT),
     toSplatOffset   = to.indexOf(SPLAT);
 
-    if (fromSplatOffset >= 0){ from = from.substr(fromSplatOffset, 0); }
-    if (toSplatOffset   >= 0){   to = to.substr(toSplatOffset, 0);     }
+    if (fromSplatOffset >= 0){ matchingFrom = from.substr(fromSplatOffset, 0); }
+    if (toSplatOffset   >= 0){   matchingTo = to.substr(toSplatOffset, 0);     }
 
-    this.on(event, function(currentFrom, currentTo)  {
-      if (fromSplatOffset >= 0){ currentFrom = currentFrom.substr(fromSplatOffset, 0); }
-      if (toSplatOffset   >= 0){   currentTo = currentTo.substr(toSplatOffset, 0);     }
+    this.on(event, function(currentFrom, currentTo) {
+      var currentMatcherTo = currentTo,
+        currentMatcherFrom = currentFrom;
 
-      if(currentTo === to && currentFrom === from){
-        fn.call(context, from, to);
+      if (fromSplatOffset >= 0){ currentMatcherFrom = currentFrom.substr(fromSplatOffset, 0); }
+      if (toSplatOffset   >= 0){   currentMatcherTo = currentTo.substr(toSplatOffset, 0);     }
+
+      if (currentMatcherTo === matchingTo && currentMatcherFrom === matchingFrom) {
+        fn.call(context, currentFrom, currentTo);
       }
     });
   },

@@ -165,10 +165,13 @@ test("unhandledEvent", function(){
 module('.beforeTransition');
 
 test('exact match', function(){
-  expect(1);
+  expect(3);
   var machine = buildMachine()
 
-  machine.beforeTransition({ from: 'alpha', to: 'beta'}, function(){
+  machine.beforeTransition({ from: 'alpha', to: 'beta'}, function(from, to){
+    equal(from, 'alpha');
+    equal(to, 'beta');
+
     ok(transitionShouldBeCalled);
   });
 
@@ -179,11 +182,14 @@ test('exact match', function(){
   machine.transitionTo('alpha')
 });
 
-test('fuzy match', function(){
-  expect(1);
+test('fuzzy match', function(){
+  expect(3);
   var machine = buildMachine()
 
-  machine.beforeTransition({ from: 'al*', to: 'beta'}, function(){
+  machine.beforeTransition({from: 'al*', to: 'beta'}, function(from, to){
+    equal(from, 'alpha');
+    equal(to, 'beta');
+
     ok(transitionShouldBeCalled);
   });
 
