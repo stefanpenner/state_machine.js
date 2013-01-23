@@ -241,3 +241,21 @@ test('DSL', function(){
 
   machine.transitionTo('beta');
 });
+
+module('.transitionTo');
+
+test('it exists', function(){
+  ok(StateMachine.transitionTo)
+});
+
+test('it works', function(){
+  expect(2);
+
+  var machine = buildMachine();
+
+  machine.states.alpha.becomeBeta = StateMachine.transitionTo('beta');
+  equal(machine.state, machine.states.alpha);
+
+  machine.send('becomeBeta');
+  equal(machine.state, machine.states.beta);
+});

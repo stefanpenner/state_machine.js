@@ -58,9 +58,14 @@ function StateMachine(options){
   }
 }
 
-StateMachine.SPLAT = SPLAT =  '*';
 SM = StateMachine;
+StateMachine.SPLAT = SPLAT = '*';
 
+StateMachine.transitionTo = function(state){
+  return function(){
+    this.transitionTo(state);
+  };
+}
 StateMachine.prototype = {
   transitionTo: function(nextStateName){
     var state = this.states[nextStateName],
