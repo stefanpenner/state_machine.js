@@ -168,7 +168,7 @@ test('exact match', function(){
   expect(1);
   var machine = buildMachine()
 
-  machine.beforeTransition('alpha','beta', function(){
+  machine.beforeTransition({ from: 'alpha', to: 'beta'}, function(){
     ok(transitionShouldBeCalled);
   });
 
@@ -183,7 +183,7 @@ test('fuzy match', function(){
   expect(1);
   var machine = buildMachine()
 
-  machine.beforeTransition('al*','beta', function(){
+  machine.beforeTransition({ from: 'al*', to: 'beta'}, function(){
     ok(transitionShouldBeCalled);
   });
 

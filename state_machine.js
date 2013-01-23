@@ -49,12 +49,12 @@ function StateMachine(options){
 
   for(var i = 0, length = beforeTransitions.length; length > i; i++){
     rule = beforeTransitions[i];
-    this.beforeTransition.call(this, rule.from, rule.to, rule.fn);
+    this.beforeTransition.call(this, rule, rule.fn);
   }
 
   for(var i = 0, length = afterTransitions.length; length > i; i++){
     rule = afterTransitions[i];
-    this.afterTransition.call(this, rule.from, rule.to, rule.fn);
+    this.afterTransition.call(this, rule, rule.fn);
   }
 }
 
@@ -83,18 +83,18 @@ StateMachine.prototype = {
     this.didTransition(previousStateName, nextStateName);
   },
 
-  beforeTransition: function(from, to, fn, fnContext) {
-    this._transition('willTransition', from, to, fn, fnContext);
+  beforeTransition: function(options, fn, fnContext) {
+    this._transition('willTransition', options, fn, fnContext);
   },
 
-  afterTransition: function(from, to, fn, fnContext) {
-    this._transition('didTransition', from, to, fn, fnContext);
+  afterTransition: function(options, fn, fnContext) {
+    this._transition('didTransition', options, fn, fnContext);
   },
 
-  _transition: function(event, from, to, fn, fnContext) {
+  _transition: function(event, options, fn, fnContext) {
     var context = fnContext || this,
-    from = from || SPLAT,
-    to   = to   || SPLAT,
+    from = options.from || SPLAT,
+    to   = options.to   || SPLAT,
 
     fromSplatOffset = from.indexOf(SPLAT),
     toSplatOffset   = to.indexOf(SPLAT);
