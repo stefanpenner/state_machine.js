@@ -32,14 +32,20 @@ if (!Array.prototype.indexOf) {
 }
 
 function StateMachine(options){
-  if (!options.initialState) {
+  var initialState = options.initialState;
+  this.states = options.states;
+
+  if (!this.states) {
+    throw new Error('StateMachine needs states');
+  }
+
+  this.state  = this.states[initialState];
+
+  if (!this.state) {
     throw new Error('Missing initial state');
   }
 
-  this.states = options.states || {};
-  this.state  = this.states[options.initialState];
-
-  this._previousStateName = options.initialState;
+  this._previousStateName = initialState;
 
   this._subscriptions = {};
 

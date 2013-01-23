@@ -259,3 +259,94 @@ test('it works', function(){
   machine.send('becomeBeta');
   equal(machine.state, machine.states.beta);
 });
+
+var userState, authPopup, authPopupIsOpen = false;
+
+module('integration',{
+  setup: function(){
+    var transitionTo = SM.transitionTo;
+
+    authPopup = new StateMachine({
+      initialState: 'closed',
+      states: {
+        closed: {
+          signUpViaFacebook: transitionTo('signingUpViaFacebook'),
+          signUpViaEmail:    transitionTo('loggingInViaEmail'),
+          loginViaFacebook:  transitionTo('loggingInViaFacebook'),
+          loginViaEmail:     transitionTo('loggingInViaEmail'),
+
+          welcomeBack:       transitionTo('welcomingBack')
+        },
+
+        signingUpViaFacebook: { },
+        signingUpViaEmail:    { },
+
+        loggingInViaFacebook: { },
+        loggingInViaEmail:    { },
+
+        recoveringPassword:   { },
+        welcomingBack:        { },
+      }
+    });
+
+    authPopup.beforeTransition({ from: '*',      to: 'closed' }, function(){ authPopupIsOpen = false });
+    authPopup.afterTransition({  from: 'closed', to: '*'      }, function(){ authPopupIsOpen = true  });
+
+    userState = new StateMachine({
+      initialState: 'unknownUser',
+      states: {
+        unknownUser:{
+          openAuthDialog: function(){ authPopup.send('signUpViaFacebook'); }
+        },
+
+        isAuthenticated:{
+          openAuthDialog: function(){ authPopup.send('signingUpViaFacebook'); }
+        },
+
+        isFacebookAuthenticated: {
+          openAuthDialog: function(){ authPopup.send('welcomBack'); }
+        },
+
+        hasFacebookConnected:{
+          openAuthDialog: function(){ authPopup.send('logInViaFacebook'); }
+        },
+
+        hasEmailedAuthenticated: {
+          openAuthDialog: function(){ authPopup.send('logInViaEmail'); }
+        }
+      }
+    });
+
+    debugger;
+  },
+
+  teardown: function(){
+    userState = authPopup = undefined;
+  }
+});
+
+test("initial states", function(){
+  expect(5);
+
+  ok(authPopup.state);
+  ok(userState.state);
+
+  equal(authPopup.state, authPopup.states.closed);
+  equal(userState.state, userState.states.unknownUser);
+
+  equal(authPopupIsOpen, false);
+});
+
+test("userState.send('openAuthDialog') puts the authPopup in the correct state", function(){
+  expect(6);
+
+  equal(authPopup.state, authPopup.states.closed);
+  equal(userState.state, userState.states.unknownUser);
+
+  equal(authPopupIsOpen, false);
+  userState.send('openAuthDialog');
+  equal(authPopupIsOpen, true);
+
+  equal(authPopup.state, authPopup.states.signingUpViaFacebook);
+  equal(userState.state, userState.states.unknownUser);
+});
