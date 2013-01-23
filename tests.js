@@ -1,6 +1,6 @@
 function buildMachine(){
   return new StateMachine({
-    state: 'alpha',
+    initialState: 'alpha',
     states: {
       alpha: {
         sayHi: function() { return 'hi from alpha'; }
@@ -27,16 +27,16 @@ test("has state", function() {
 test("transitions to existing state", function(){
   expect(2);
   var machine = buildMachine()
-  equal(machine.state, 'alpha');
+  equal(machine.state, machine.states.alpha);
   machine.transitionTo('beta');
-  equal(machine.state, 'beta');
+  equal(machine.state, machine.states.beta);
 });
 
 test("willTransition", function(){
   expect(2);
   var machine = buildMachine()
   machine.on('willTransition', function(from, to){
-    equal(from,'alpha');
+    equal(from, 'alpha');
     equal(to,  'beta');
   });
   machine.transitionTo('beta');
@@ -212,7 +212,7 @@ test('DSL', function(){
       }
     ],
 
-    state: 'alpha',
+    initialState: 'alpha',
     states: {
       alpha: {
         sayHi: function() { return 'hi from alpha'; }

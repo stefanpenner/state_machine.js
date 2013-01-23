@@ -32,12 +32,15 @@ if (!Array.prototype.indexOf) {
 }
 
 function StateMachine(options){
-  if (!options.state) {
+  if (!options.initialState) {
     throw new Error('Missing initial state');
   }
 
-  this.state = options.state;
   this.states = options.states || {};
+  this.state  = this.states[options.initialState];
+
+  this._previousStateName = options.initialState;
+
   this._subscriptions = {};
 
   var beforeTransitions = (options.beforeTransitions ||[]);
@@ -58,17 +61,20 @@ function StateMachine(options){
 StateMachine.SPLAT = SPLAT =  '*';
 
 StateMachine.prototype = {
-  transitionTo: function(nextState){
-    var state = this.states[nextState],
-    previousState = this.state;
+  transitionTo: function(nextStateName){
+    var state = this.states[nextStateName],
+    previousStateName = this._previousStateName;
 
     if (!state) {
       throw new Error('Unknown State:' + nextState);
     }
 
-    this.willTransition(previousState, nextState);
-    this.state = nextState;
-    this.didTransition(previousState, nextState);
+    this.willTransition(previousStateName, nextStateName);
+
+    this.state = state;
+
+    this._previousStateName = nextStateName;
+    this.didTransition(previousStateName, nextStateName);
   },
 
   beforeTransition: function(from, to, fn, fnContext) {
@@ -134,7 +140,7 @@ StateMachine.prototype = {
   },
 
   send: function(eventName) {
-    var event = this.states[this.state][eventName];
+    var event = this.state[eventName];
 
     if (event) {
       return event.call(this);
