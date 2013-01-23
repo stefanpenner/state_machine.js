@@ -84,14 +84,14 @@ StateMachine.prototype = {
   },
 
   beforeTransition: function(from, to, fn, fnContext) {
-    this._fuzzyTransition('willTransition', from, to, fn, fnContext);
+    this._transition('willTransition', from, to, fn, fnContext);
   },
 
   afterTransition: function(from, to, fn, fnContext) {
-    this._fuzzyTransition('didTransition', from, to, fn, fnContext);
+    this._transition('didTransition', from, to, fn, fnContext);
   },
 
-  _fuzzyTransition: function(event, from, to, fn, fnContext) {
+  _transition: function(event, from, to, fn, fnContext) {
     var context = fnContext || this,
     from = from || SPLAT,
     to   = to   || SPLAT,
