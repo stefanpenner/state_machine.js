@@ -316,8 +316,6 @@ module('integration',{
         }
       }
     });
-
-    debugger;
   },
 
   teardown: function(){
