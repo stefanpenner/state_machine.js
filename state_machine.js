@@ -45,7 +45,7 @@ function StateMachine(options){
     throw new Error('Missing initial state');
   }
 
-  this._previousStateName = initialState;
+  this.currentStateName = initialState;
 
   this._subscriptions = {};
 
@@ -75,18 +75,18 @@ StateMachine.transitionTo = function(state){
 StateMachine.prototype = {
   transitionTo: function(nextStateName){
     var state = this.states[nextStateName],
-    previousStateName = this._previousStateName;
+    stateName = this.currentStateName;
 
     if (!state) {
       throw new Error('Unknown State:' + nextState);
     }
 
-    this.willTransition(previousStateName, nextStateName);
+    this.willTransition(stateName, nextStateName);
 
     this.state = state;
 
-    this._previousStateName = nextStateName;
-    this.didTransition(previousStateName, nextStateName);
+    this.currentStateName = nextStateName;
+    this.didTransition(stateName, nextStateName);
   },
 
   beforeTransition: function(options, fn, fnContext) {
