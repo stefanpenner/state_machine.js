@@ -79,7 +79,7 @@ StateMachine.prototype = {
     stateName = this.currentStateName;
 
     if (!state) {
-      throw new Error('Unknown State:' + nextState);
+      throw new Error('Unknown State: `' + nextStateName + '`');
     }
 
     this.willTransition(stateName, nextStateName);

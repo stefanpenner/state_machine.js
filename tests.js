@@ -35,6 +35,20 @@ test("transitions to existing state", function(){
   equal(machine.state, machine.states.beta);
 });
 
+test("fails to transition to none-existent state", function(){
+  expect(3);
+  var machine = buildMachine()
+  equal(machine.state, machine.states.alpha);
+
+  throws(function(){
+    machine.transitionTo('OMG');
+  }, function(error){
+    return error.message === 'Unknown State: `OMG`';
+  }, "throws an error");
+
+  equal(machine.state, machine.states.alpha, 'remains in original state if destination state does not exist');
+});
+
 test("willTransition", function(){
   expect(2);
   var machine = buildMachine()
