@@ -72,6 +72,7 @@ StateMachine.transitionTo = function(state){
     this.transitionTo(state);
   };
 }
+
 StateMachine.prototype = {
   transitionTo: function(nextStateName){
     var state = this.states[nextStateName],
@@ -89,22 +90,21 @@ StateMachine.prototype = {
     this.didTransition(stateName, nextStateName);
   },
 
-  beforeTransition: function(options, fn, fnContext) {
-    this._transition('willTransition', options, fn, fnContext);
+  beforeTransition: function(options, fn) {
+    this._transition('willTransition', options, fn);
   },
 
-  afterTransition: function(options, fn, fnContext) {
-    this._transition('didTransition', options, fn, fnContext);
+  afterTransition: function(options, fn) {
+    this._transition('didTransition', options, fn);
   },
 
-  _transition: function(event, options, fn, fnContext) {
-    var context = fnContext || this,
-    from = options.from || SPLAT,
-    to   = options.to   || SPLAT,
+  _transition: function(event, options, fn) {
+    var from = options.from || SPLAT,
+    to = options.to || SPLAT,
     matchingFrom = from,
-    matchingTo  = to,
+    matchingTo = to,
     fromSplatOffset = from.indexOf(SPLAT),
-    toSplatOffset   = to.indexOf(SPLAT);
+    toSplatOffset = to.indexOf(SPLAT);
 
     if (fromSplatOffset >= 0){ matchingFrom = from.substr(fromSplatOffset, 0); }
     if (toSplatOffset   >= 0){   matchingTo = to.substr(toSplatOffset, 0);     }
@@ -117,7 +117,7 @@ StateMachine.prototype = {
       if (toSplatOffset   >= 0){   currentMatcherTo = currentTo.substr(toSplatOffset, 0);     }
 
       if (currentMatcherTo === matchingTo && currentMatcherFrom === matchingFrom) {
-        fn.call(context, currentFrom, currentTo);
+        fn.call(null, currentFrom, currentTo);
       }
     });
   },
