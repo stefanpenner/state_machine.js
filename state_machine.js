@@ -98,23 +98,23 @@ StateMachine.prototype = {
     this._transition('didTransition', options, fn);
   },
 
-  _transition: function(event, options, fn) {
-    var from = options.from || SPLAT,
-    to = options.to || SPLAT,
+  _transition: function(event, filter, fn) {
+    var from = filter.from || SPLAT,
+    to = filter.to || SPLAT,
     matchingFrom = from,
     matchingTo = to,
     fromSplatOffset = from.indexOf(SPLAT),
     toSplatOffset = to.indexOf(SPLAT);
 
-    if (fromSplatOffset >= 0){ matchingFrom = from.substr(fromSplatOffset, 0); }
-    if (toSplatOffset   >= 0){   matchingTo = to.substr(toSplatOffset, 0);     }
+    if (fromSplatOffset >= 0){ matchingFrom = from.substring(fromSplatOffset, 0); }
+    if (toSplatOffset   >= 0){   matchingTo = to.substring(toSplatOffset, 0);     }
 
     this.on(event, function(currentFrom, currentTo) {
       var currentMatcherTo = currentTo,
         currentMatcherFrom = currentFrom;
 
-      if (fromSplatOffset >= 0){ currentMatcherFrom = currentFrom.substr(fromSplatOffset, 0); }
-      if (toSplatOffset   >= 0){   currentMatcherTo = currentTo.substr(toSplatOffset, 0);     }
+      if (fromSplatOffset >= 0){ currentMatcherFrom = currentFrom.substring(fromSplatOffset, 0); }
+      if (toSplatOffset   >= 0){   currentMatcherTo = currentTo.substring(toSplatOffset, 0);     }
 
       if (currentMatcherTo === matchingTo && currentMatcherFrom === matchingFrom) {
         fn.call(null, currentFrom, currentTo);
@@ -166,6 +166,7 @@ StateMachine.prototype = {
   },
 
   unhandledEvent: function(event){
-    throw new Error("Unknown Event: `" + event + "` for state: `" + this.currentStateName + "`");
+    var currentStateName = this.currentStateName;
+    throw new Error("Unknown Event: `" + event + "` for state: `" + currentStateName + "`");
   }
 };

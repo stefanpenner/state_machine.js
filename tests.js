@@ -196,7 +196,7 @@ test('exact match', function(){
   machine.transitionTo('alpha')
 });
 
-test('fuzzy match', function(){
+test('fuzzy match simple', function(){
   expect(3);
   var machine = buildMachine()
 
@@ -213,6 +213,27 @@ test('fuzzy match', function(){
   transitionShouldBeCalled = true;
   machine.transitionTo('alpha')
 });
+
+test('fuzzy match more complex', function(){
+  expect(3);
+  var machine = buildMachine()
+
+  machine.transitionTo('beta')
+  equal(machine.currentStateName, 'beta');
+
+  var transitionWasCalled = false;
+
+  machine.beforeTransition({from: '*', to: 'bet*'}, function(from, to){
+    transitionWasCalled = true;
+  });
+
+  transitionShouldBeCalled = true;
+  machine.transitionTo('alpha');
+
+  ok(!transitionWasCalled, 'the transition should not have been called');
+  equal(machine.currentStateName, 'alpha');
+});
+
 
 test('DSL', function(){
   expect(4);
