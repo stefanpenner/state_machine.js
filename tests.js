@@ -301,37 +301,43 @@ test('it works', function(){
   equal(machine.state, machine.states.beta);
 });
 
-var userState, authPopup, authPopupIsOpen = false;
+var userState, authPopup, authPopupIsOpen, signingUpIsOpen
+signingUpViaFacebookIsOpen = signingUpViaEmailIsOpen = null;
 
 module('integration',{
   setup: function(){
     var transitionTo = SM.transitionTo;
+    authPopupIsOpen = signingUpIsOpen = signingUpViaFacebookIsOpen = signingUpViaEmailIsOpen = false;
 
     authPopup = new StateMachine({
       initialState: 'closed',
       states: {
         closed: {
-          signUpViaFacebook: transitionTo('signingUpViaFacebook'),
-          signUpViaEmail:    transitionTo('loggingInViaEmail'),
-          loginViaFacebook:  transitionTo('loggingInViaFacebook'),
-          loginViaEmail:     transitionTo('loggingInViaEmail'),
+          signUpViaFacebook: transitionTo('open.signingUp.viaFacebook'),
+          signUpViaEmail:    transitionTo('open.loggingIn.viaEmail'),
+          logInViaFacebook:  transitionTo('open.loggingIn.viaFacebook'),
+          logInViaEmail:     transitionTo('open.loggingIn.viaEmail'),
 
-          welcomeBack:       transitionTo('welcomingBack')
+          welcomeBack:       transitionTo('open.welcomingBack')
         },
 
-        signingUpViaFacebook: { },
-        signingUpViaEmail:    { },
+        'open.signingUp.viaFacebook': { },
+        'open.signingUp.viaEmail':    { },
 
-        loggingInViaFacebook: { },
-        loggingInViaEmail:    { },
+        'open.loggingIn.viaFacebook': { },
+        'open.loggingIn.viaEmail':    { },
 
-        recoveringPassword:   { },
-        welcomingBack:        { },
+        'open.recoveringPassword':   { },
+        'open.welcomingBack':        { },
       }
     });
 
-    authPopup.beforeTransition({ from: '*',      to: 'closed' }, function(){ authPopupIsOpen = false });
-    authPopup.afterTransition({  from: 'closed', to: '*'      }, function(){ authPopupIsOpen = true  });
+    authPopup.beforeTransition({ from: 'open.*',      to: 'closed' }, function(){ authPopupIsOpen = false });
+    authPopup.afterTransition({  from: 'closed', to: 'open.*'      }, function(){ authPopupIsOpen = true  });
+
+    authPopup.afterTransition({  from: '*', to: 'open.signingUp.*'           }, function(){ signingUpIsOpen = true  });
+    authPopup.afterTransition({  from: '*', to: 'open.signingUp.viaFacebook' }, function(){ signingUpViaFacebookIsOpen = true });
+    authPopup.afterTransition({  from: '*', to: 'open.loggingIn.viaEmail' },    function(){ signingUpViaEmailIsOpen = true });
 
     userState = new StateMachine({
       initialState: 'unknownUser',
@@ -341,7 +347,7 @@ module('integration',{
         },
 
         isAuthenticated:{
-          openAuthDialog: function(){ authPopup.send('signingUpViaFacebook'); }
+          openAuthDialog: function(){ /* N/A */ }
         },
 
         isFacebookAuthenticated: {
@@ -361,6 +367,7 @@ module('integration',{
 
   teardown: function(){
     userState = authPopup = undefined;
+    authPopupIsOpen = signingUpIsOpen = signingUpViaFacebookIsOpen = signingUpViaEmailIsOpen = false;
   }
 });
 
@@ -370,22 +377,38 @@ test("initial states", function(){
   ok(authPopup.state);
   ok(userState.state);
 
-  equal(authPopup.state, authPopup.states.closed);
-  equal(userState.state, userState.states.unknownUser);
+  equal(authPopup.currentStateName, 'closed');
+  equal(userState.currentStateName, 'unknownUser');
 
   equal(authPopupIsOpen, false);
 });
 
 test("userState.send('openAuthDialog') puts the authPopup in the correct state", function(){
-  expect(6);
+  expect(14);
 
-  equal(authPopup.state, authPopup.states.closed);
-  equal(userState.state, userState.states.unknownUser);
+  equal(authPopup.currentStateName, 'closed');
+  equal(userState.currentStateName, 'unknownUser');
 
   equal(authPopupIsOpen, false);
-  userState.send('openAuthDialog');
-  equal(authPopupIsOpen, true);
+  equal(signingUpIsOpen, false);
+  equal(signingUpViaFacebookIsOpen, false);
 
-  equal(authPopup.state, authPopup.states.signingUpViaFacebook);
-  equal(userState.state, userState.states.unknownUser);
+  userState.send('openAuthDialog');
+
+  equal(authPopupIsOpen, true);
+  equal(signingUpIsOpen, true);
+  equal(signingUpViaFacebookIsOpen, true);
+
+  equal(authPopup.currentStateName, 'open.signingUp.viaFacebook');
+  equal(userState.currentStateName, 'unknownUser');
+
+  signingUpViaFacebookIsOpen  = false;
+  userState.transitionTo('hasEmailedAuthenticated');
+  authPopup.transitionTo('closed');
+  userState.send('openAuthDialog');
+
+  equal(authPopupIsOpen, true, 'authPopup is active');
+  equal(signingUpIsOpen, true, 'signingUp is active');
+  equal(signingUpViaFacebookIsOpen ,false, 'signingUpViaFacebook is NOT active');
+  equal(signingUpViaEmailIsOpen, true, 'signingUpViaEmail is active');
 });

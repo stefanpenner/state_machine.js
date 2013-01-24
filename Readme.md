@@ -1,59 +1,59 @@
 
 ```javascript
-var userState, authPopup;
+ var transitionTo = SM.transitionTo;
 
-var transitionTo = SM.transitionTo;
+ authPopup = new StateMachine({
+   initialState: 'closed',
+   states: {
+     closed: {
+       signUpViaFacebook: transitionTo('open.signingUp.viaFacebook'),
+       signUpViaEmail:    transitionTo('open.loggingIn.viaEmail'),
+       logInViaFacebook:  transitionTo('open.loggingIn.viaFacebook'),
+       logInViaEmail:     transitionTo('open.loggingIn.viaEmail'),
 
-authPopup = new StateMachine({
-  initialState: 'closed',
+       welcomeBack:       transitionTo('open.welcomingBack')
+     },
 
-  states: {
-    closed: {
-      signUpViaFacebook: transitionTo('signingUpViaFacebook'),
-      signUpViaEmail:    transitionTo('loggingInViaEmail'),
-      loginViaFacebook:  transitionTo('loggingInViaFacebook'),
-      loginViaEmail:     transitionTo('loggingInViaEmail'),
+     'open.signingUp.viaFacebook': { },
+     'open.signingUp.viaEmail':    { },
 
-      welcomeBack:       transitionTo('welcomingBack')
-    },
+     'open.loggingIn.viaFacebook': { },
+     'open.loggingIn.viaEmail':    { },
 
-    signingUpViaFacebook: { },
-    signingUpViaEmail:    { },
+     'open.recoveringPassword':   { },
+     'open.welcomingBack':        { },
+   }
+ });
 
-    loggingInViaFacebook: { },
-    loggingInViaEmail:    { },
+ authPopup.beforeTransition({ from: 'open.*',      to: 'closed' }, function(){ authPopupIsOpen = false });
+ authPopup.afterTransition({  from: 'closed', to: 'open.*'      }, function(){ authPopupIsOpen = true  });
 
-    recoveringPassword:   { },
-    welcomingBack:        { }
-  }
-});
+ authPopup.afterTransition({  from: '*', to: 'open.signingUp.*'           }, function(){ signingUpIsOpen = true  });
+ authPopup.afterTransition({  from: '*', to: 'open.signingUp.viaFacebook' }, function(){ signingUpViaFacebookIsOpen = true });
+ authPopup.afterTransition({  from: '*', to: 'open.loggingIn.viaEmail' },    function(){ signingUpViaEmailIsOpen = true });
 
-authPopup.beforeTransition({ from: '*',      to: 'closed' }, function(){ console.log('close window'); });
-authPopup.afterTransition({  from: 'closed', to: '*'      }, function(){ console.log('open window');  });
+ userState = new StateMachine({
+   initialState: 'unknownUser',
+   states: {
+     unknownUser:{
+       openAuthDialog: function(){ authPopup.send('signUpViaFacebook'); }
+     },
 
-userState = new StateMachine({
-  initialState: 'unknownUser',
-  states: {
-    unknownUser:{
-      openAuthDialog: function(){ authPopup.send('signupViaFacebook'); }
-    },
+     isAuthenticated:{
+       openAuthDialog: function(){ /* N/A */ }
+     },
 
-    isAuthenticated:{
-      openAuthDialog: function(){ authPopup.send('signingUpViaFacebook'); }
-    },
+     isFacebookAuthenticated: {
+       openAuthDialog: function(){ authPopup.send('welcomBack'); }
+     },
 
-    isFacebookAuthenticated: {
-      openAuthDialog: function(){ authPopup.send('welcomBack'); }
-    },
+     hasFacebookConnected:{
+       openAuthDialog: function(){ authPopup.send('logInViaFacebook'); }
+     },
 
-    hasFacebookConnected:{
-      openAuthDialog: function(){ authPopup.send('logInViaFacebook'); }
-    },
-
-    hasEmailedAuthenticated: {
-      openAuthDialog: function(){ authPopup.send('logInViaEmail'); }
-    }
-  }
-});
-
+     hasEmailedAuthenticated: {
+       openAuthDialog: function(){ authPopup.send('logInViaEmail'); }
+     }
+   }
+ });
 ```
