@@ -146,7 +146,7 @@ test("no unhandledEvent", function(){
   throws(function(){
     machine.send('unknownEventName')
   }, function(error){
-    return error.message === "Unknown Event: `unknownEventName`";
+    return error.message === "Unknown Event: `unknownEventName` for state: `alpha`";
   }, "throws an error");
 });
 
