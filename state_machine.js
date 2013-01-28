@@ -158,9 +158,8 @@ StateMachine.prototype = {
     }
   },
 
-  send: function() {
-    var eventName = arguments[0],
-    event = this.state[eventName],
+  send: function(eventName) {
+    var event = this.state[eventName],
     args = slice.call(arguments,1);
 
     if (event) {
@@ -170,9 +169,8 @@ StateMachine.prototype = {
     }
   },
 
-  trySend: function() {
-    var eventName = arguments[0],
-    event = this.state[eventName],
+  trySend: function(eventName) {
+    var event = this.state[eventName],
     args = slice.call(arguments,1);
 
     if (event) {
