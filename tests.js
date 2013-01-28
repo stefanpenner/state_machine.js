@@ -88,6 +88,12 @@ test("send", function(){
   equal(machine.send("sayHi"), "hi from beta");
 });
 
+test("trySend", function(){
+  expect(0);
+  var machine = buildMachine()
+  machine.trySend("unknownMethod")
+});
+
 var machine;
 
 

@@ -165,6 +165,14 @@ StateMachine.prototype = {
     }
   },
 
+  trySend: function(eventName) {
+    var event = this.state[eventName];
+
+    if (event) {
+      return event.call(this);
+    }
+  },
+
   unhandledEvent: function(event){
     var currentStateName = this.currentStateName;
     throw new Error("Unknown Event: `" + event + "` for state: `" + currentStateName + "`");
