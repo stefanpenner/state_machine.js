@@ -27,7 +27,7 @@ test("has state", function() {
   ok(machine.state);
 });
 
-test("transitions to existing state", function(){
+test("transitions to existing root state", function(){
   expect(2);
   var machine = buildMachine()
   equal(machine.state, machine.states.alpha);
