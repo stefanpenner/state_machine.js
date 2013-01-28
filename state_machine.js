@@ -31,6 +31,8 @@ if (!Array.prototype.indexOf) {
   }
 }
 
+var slice = Array.prototype.slice;
+
 function StateMachine(options){
   var initialState = options.initialState;
   this.states = options.states;
@@ -155,21 +157,25 @@ StateMachine.prototype = {
     }
   },
 
-  send: function(eventName) {
-    var event = this.state[eventName];
+  send: function() {
+    var eventName = slice.call(arguments, 0, 1)[0],
+    event = this.state[eventName],
+    args = slice.call(arguments,1);
 
     if (event) {
-      return event.call(this);
+      return event.apply(this, args);
     }else{
       this.unhandledEvent(eventName);
     }
   },
 
-  trySend: function(eventName) {
-    var event = this.state[eventName];
+  trySend: function() {
+    var eventName = slice.call(arguments, 0, 1)[0],
+    event = this.state[eventName],
+    args = slice.call(arguments,1);
 
     if (event) {
-      return event.call(this);
+      return event.apply(this, args);
     }
   },
 

@@ -3,10 +3,16 @@ function buildMachine(){
     initialState: 'alpha',
     states: {
       alpha: {
-        sayHi: function() { return 'hi from alpha'; }
+        sayHi: function(from) {
+          from = from || 'alpha';
+          return 'hi from ' + from;
+        }
       },
       beta: {
-        sayHi: function() { return 'hi from beta'; }
+        sayHi: function(from) {
+          from = from || 'beta';
+          return 'hi from ' + from;
+        }
       }
     }
   });
@@ -86,6 +92,11 @@ test("send", function(){
   equal(machine.send("sayHi"), "hi from alpha");
   machine.transitionTo('beta');
   equal(machine.send("sayHi"), "hi from beta");
+});
+
+test("send with arguments", function(){
+  var machine = buildMachine()
+  equal(machine.send("sayHi", 'luke'), "hi from luke");
 });
 
 test("trySend", function(){
@@ -288,6 +299,8 @@ test('DSL', function(){
 
   machine.transitionTo('beta');
 });
+
+module('implicity enter/exit');
 
 module('.transitionTo');
 
