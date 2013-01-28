@@ -24,18 +24,19 @@ test('SM is StateMachine', function(){
 });
 
 test("has states", function() {
-  var machine = buildMachine()
+  var machine = buildMachine();
   ok(machine.states);
 });
 
 test("has state", function() {
-  var machine = buildMachine()
+  var machine = buildMachine();
   ok(machine.state);
 });
 
 test("transitions to existing root state", function(){
   expect(2);
-  var machine = buildMachine()
+  var machine = buildMachine();
+
   equal(machine.state, machine.states.alpha);
   machine.transitionTo('beta');
   equal(machine.state, machine.states.beta);
@@ -43,7 +44,8 @@ test("transitions to existing root state", function(){
 
 test("fails to transition to none-existent state", function(){
   expect(3);
-  var machine = buildMachine()
+  var machine = buildMachine();
+
   equal(machine.state, machine.states.alpha);
 
   throws(function(){
@@ -56,9 +58,9 @@ test("fails to transition to none-existent state", function(){
 });
 
 test("willTransition", function(){
-  expect(2);
-  var machine = buildMachine()
   expect(3);
+  var machine = buildMachine();
+
   machine.on('willTransition', function(from, to){
     equal(from, 'alpha');
     equal(to,  'beta');
@@ -91,7 +93,8 @@ test("didTransition", function(){
 });
 
 test("send", function(){
-  var machine = buildMachine()
+  var machine = buildMachine();
+
   equal(machine.send("sayHi"), "hi from alpha");
   machine.transitionTo('beta');
   equal(machine.send("sayHi"), "hi from beta");
@@ -104,7 +107,7 @@ test("send with arguments", function(){
 
 test("trySend", function(){
   expect(0);
-  var machine = buildMachine()
+  var machine = buildMachine();
   machine.trySend("unknownMethod")
 });
 
@@ -112,10 +115,10 @@ var machine;
 
 
 test("on", function(){
-  var machine = buildMachine()
+  var machine = buildMachine();
   expect(2);
 
-  var firstTransition =  function(from, to){
+  var firstTransition = function(from, to){
     equal(from,'alpha');
     equal(to,  'beta');
   };
@@ -126,7 +129,7 @@ test("on", function(){
 });
 
 test("off.global", function(){
-  var machine = buildMachine()
+  var machine = buildMachine();
   expect(1);
 
   var shouldRun,
@@ -144,7 +147,7 @@ test("off.global", function(){
 });
 
 test("off.specific", function(){
-  var machine = buildMachine()
+  var machine = buildMachine();
   expect(3);
 
   var fooShouldRun,
@@ -174,7 +177,7 @@ test("off.specific", function(){
 module('.unhandledEvent');
 
 test("no unhandledEvent", function(){
-  var machine = buildMachine()
+  var machine = buildMachine();
   expect(1);
 
   throws(function(){
@@ -185,7 +188,7 @@ test("no unhandledEvent", function(){
 });
 
 test("unhandledEvent", function(){
-  var machine = buildMachine()
+  var machine = buildMachine();
   expect(1);
   var originalEventName = 'unknownEventName'
 
@@ -200,7 +203,7 @@ module('.beforeTransition');
 
 test('exact match', function(){
   expect(3);
-  var machine = buildMachine()
+  var machine = buildMachine();
 
   machine.beforeTransition({ from: 'alpha', to: 'beta'}, function(from, to){
     equal(from, 'alpha');
@@ -218,7 +221,7 @@ test('exact match', function(){
 
 test('fuzzy match simple', function(){
   expect(3);
-  var machine = buildMachine()
+  var machine = buildMachine();
 
   machine.beforeTransition({from: 'al*', to: 'beta'}, function(from, to){
     equal(from, 'alpha');
@@ -236,7 +239,7 @@ test('fuzzy match simple', function(){
 
 test('fuzzy match more complex', function(){
   expect(3);
-  var machine = buildMachine()
+  var machine = buildMachine();
 
   machine.transitionTo('beta')
   equal(machine.currentStateName, 'beta');
