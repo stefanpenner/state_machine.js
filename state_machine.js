@@ -106,7 +106,8 @@ StateMachine.prototype = {
     matchingFrom = from,
     matchingTo = to,
     fromSplatOffset = from.indexOf(SPLAT),
-    toSplatOffset = to.indexOf(SPLAT);
+    toSplatOffset = to.indexOf(SPLAT),
+    context = this;
 
     if (fromSplatOffset >= 0){ matchingFrom = from.substring(fromSplatOffset, 0); }
     if (toSplatOffset   >= 0){   matchingTo = to.substring(toSplatOffset, 0);     }
@@ -119,7 +120,7 @@ StateMachine.prototype = {
       if (toSplatOffset   >= 0){   currentMatcherTo = currentTo.substring(toSplatOffset, 0);     }
 
       if (currentMatcherTo === matchingTo && currentMatcherFrom === matchingFrom) {
-        fn.call(null, currentFrom, currentTo);
+        fn.call(context, currentFrom, currentTo);
       }
     });
   },

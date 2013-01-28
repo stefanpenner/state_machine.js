@@ -58,10 +58,13 @@ test("fails to transition to none-existent state", function(){
 test("willTransition", function(){
   expect(2);
   var machine = buildMachine()
+  expect(3);
   machine.on('willTransition', function(from, to){
     equal(from, 'alpha');
     equal(to,  'beta');
+    equal(this, machine, 'the transition callback is context is the machine');
   });
+
   machine.transitionTo('beta');
   machine.off('willTransition');
 });
