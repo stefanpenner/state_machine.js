@@ -1,3 +1,4 @@
+
 function buildMachine(){
   return new StateMachine({
     initialState: 'alpha',
@@ -110,9 +111,6 @@ test("trySend", function(){
   var machine = buildMachine();
   machine.trySend("unknownMethod")
 });
-
-var machine;
-
 
 test("on", function(){
   var machine = buildMachine();
