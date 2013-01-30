@@ -14,6 +14,13 @@ function buildMachine(){
           from = from || 'beta';
           return 'hi from ' + from;
         }
+      },
+
+      'gamma.ready': {
+      },
+
+      'gamma.pending': {
+
       }
     }
   });
@@ -91,6 +98,31 @@ test("didTransition", function(){
 
   machine.off('willTransition');
   machine.off('didTransition');
+});
+
+test("relative transitionTo simple", function(){
+  expect(2);
+
+  var machine = buildMachine();
+
+  equal(machine.currentStateName, 'alpha');
+
+  machine.transitionTo('.beta');
+
+  equal(machine.currentStateName, 'beta');
+});
+
+test("relative transitionTo nested (batshit crazy)", function(){
+  expect(2);
+
+  var machine = buildMachine();
+  machine.transitionTo('gamma.ready');
+
+  equal(machine.currentStateName, 'gamma.ready');
+
+  machine.transitionTo('.pending');
+
+  equal(machine.currentStateName, 'gamma.pending');
 });
 
 test("send", function(){
@@ -435,3 +467,4 @@ test("userState.send('openAuthDialog') puts the authPopup in the correct state",
   equal(signingUpViaFacebookIsOpen ,false, 'signingUpViaFacebook is NOT active');
   equal(signingUpViaEmailIsOpen, true, 'signingUpViaEmail is active');
 });
+

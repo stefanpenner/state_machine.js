@@ -41,11 +41,93 @@ if (!Object.create) {
     return new F();
   };
 }
-var slice = Array.prototype.slice;
+if (!Object.keys) {
+  Object.keys = (function () {
+    var hasOwnProperty = Object.prototype.hasOwnProperty,
+        hasDontEnumBug = !({toString: null}).propertyIsEnumerable('toString'),
+        dontEnums = [
+          'toString',
+          'toLocaleString',
+          'valueOf',
+          'hasOwnProperty',
+          'isPrototypeOf',
+          'propertyIsEnumerable',
+          'constructor'
+        ],
+        dontEnumsLength = dontEnums.length;
+
+    return function (obj) {
+      if (typeof obj !== 'object' && typeof obj !== 'function' || obj === null) throw new TypeError('Object.keys called on non-object');
+
+      var result = [];
+
+      for (var prop in obj) {
+        if (hasOwnProperty.call(obj, prop)) result.push(prop);
+      }
+
+      if (hasDontEnumBug) {
+        for (var i=0; i < dontEnumsLength; i++) {
+          if (hasOwnProperty.call(obj, dontEnums[i])) result.push(dontEnums[i]);
+        }
+      }
+      return result;
+    }
+  })()
+};
+
+if ( !Array.prototype.forEach ) {
+  Array.prototype.forEach = function(fn, scope) {
+    for(var i = 0, len = this.length; i < len; ++i) {
+      fn.call(scope, this[i], i, this);
+    }
+  }
+}
+
+var a_slice = Array.prototype.slice;
+var o_keys = Object.keys;
+
+function compileStates(states){
+  var result = {}, nestedResult, entry,
+  nestedEntry, keys;
+
+  if (!states) {
+    return result;
+  }
+
+  o_keys(states).forEach(function(key,b){
+    entry = states[key];
+
+    if (entry.constructor === Object){
+      keys = o_keys(entry);
+
+      if(keys.length === 0){
+        result[key] = entry;
+      }else{
+        keys.forEach(function(nestedKey){
+          nestedEntry = entry[nestedKey];
+
+          if (nestedEntry.constructor === Object){
+            // recursion bro
+            result[ key + '.' + nestedKey] = nestedEntry;
+          }else{
+            result[key] = result[key] || {};
+            result[key][nestedKey] = nestedEntry;
+          }
+        });
+      }
+    }else{
+      result[key] = entry;
+    }
+  })
+
+  return result;
+}
+
+StateMachine._compileStates = compileStates;
 
 function StateMachine(options){
   var initialState = options.initialState;
-  this.states = options.states;
+  this.states = compileStates(options.states);
 
   if (!this.states) {
     throw new Error('StateMachine needs states');
@@ -87,13 +169,24 @@ StateMachine.transitionTo = function(state){
 
 StateMachine.prototype = {
   transitionTo: function(nextStateName){
+
+    if (nextStateName.charAt(0) === '.') {
+      var splits = this.currentStateName.split('.').slice(0,-1);
+
+      // maybe all states should have an implicit leading dot (kinda like dns)
+      if (0 < splits.length){
+        nextStateName = splits.join('.') + nextStateName;
+      } else {
+        nextStateName = nextStateName.substring(1)
+      }
+    }
+
     var state = this.states[nextStateName],
     stateName = this.currentStateName;
 
     if (!state) {
       throw new Error('Unknown State: `' + nextStateName + '`');
     }
-
     this.willTransition(stateName, nextStateName);
 
     this.state = state;
@@ -170,7 +263,7 @@ StateMachine.prototype = {
 
   send: function(eventName) {
     var event = this.state[eventName],
-    args = slice.call(arguments,1);
+    args = a_slice.call(arguments,1);
 
     if (event) {
       return event.apply(this, args);
@@ -181,7 +274,7 @@ StateMachine.prototype = {
 
   trySend: function(eventName) {
     var event = this.state[eventName],
-    args = slice.call(arguments,1);
+    args = a_slice.call(arguments,1);
 
     if (event) {
       return event.apply(this, args);
