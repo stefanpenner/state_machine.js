@@ -482,3 +482,70 @@ test("userState.send('openAuthDialog') puts the authPopup in the correct state",
   equal(signingUpViaEmailIsOpen, true, 'signingUpViaEmail is active');
 });
 
+module("compileStates");
+
+var compileStates = StateMachine._compileStates;
+test("empty", function(){
+  expect(3);
+
+  deepEqual(compileStates(), {});
+  deepEqual(compileStates(null), {});
+  deepEqual(compileStates({}), {});
+});
+
+test("no nesting", function(){
+  var states = {
+    alpha: {},
+    beta: {}
+  },
+  compiledStates = compileStates(states);
+
+  deepEqual(compiledStates, states);
+})
+
+test("nesting", function(){
+  var states = {
+    alpha: {
+      ready:   {},
+      pending: {},
+      failed:  {}
+    },
+    beta: {
+      ready:   {},
+      pending: {},
+      failed:  {},
+      gamma: {
+        ready:   {},
+        pending: {},
+        failed:  {},
+        zeta: {
+          ready:   {},
+          pending: {},
+          failed:  {}
+        }
+      }
+    }
+  },
+
+  expectedCompiledStates = {
+    'alpha.ready':   {},
+    'alpha.pending': {},
+    'alpha.failed':  {},
+
+    'beta.ready':    {},
+    'beta.pending':  {},
+    'beta.failed':   {},
+
+    'beta.gamma.ready':    {},
+    'beta.gamma.pending':  {},
+    'beta.gamma.failed':   {},
+
+    'beta.gamma.zeta.ready':    {},
+    'beta.gamma.zeta.pending':  {},
+    'beta.gamma.zeta.failed':   {},
+  },
+
+  actualCompiledStats = compileStates(states);
+
+  deepEqual(actualCompiledStats, expectedCompiledStates)
+})
