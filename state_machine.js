@@ -123,8 +123,6 @@ function compileStates(states){
   return result;
 }
 
-StateMachine._compileStates = compileStates;
-
 function StateMachine(options){
   var initialState = options.initialState;
   this.states = compileStates(options.states);
@@ -160,6 +158,7 @@ function StateMachine(options){
 
 SM = StateMachine;
 StateMachine.SPLAT = SPLAT = '*';
+StateMachine._compileStates = compileStates;
 
 StateMachine.transitionTo = function(state){
   return function(){
