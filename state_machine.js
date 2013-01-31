@@ -160,6 +160,9 @@ SM = StateMachine;
 StateMachine.SPLAT = SPLAT = '*';
 StateMachine._compileStates = compileStates;
 
+window.StateMachine = StateMachine;
+
+
 StateMachine.transitionTo = function(state){
   return function(){
     this.transitionTo(state);
