@@ -165,7 +165,7 @@ StateMachine.transitionTo = function(state){
   return function(){
     this.transitionTo(state);
   };
-}
+};
 
 StateMachine.prototype = {
   transitionTo: function(nextStateName){
