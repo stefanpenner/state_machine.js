@@ -232,39 +232,29 @@ test("unhandledEvent", function(){
 module('.beforeTransition');
 
 test('exact match', function(){
-  expect(3);
+  expect(2);
   var machine = buildMachine();
 
   machine.beforeTransition({ from: 'alpha', to: 'beta'}, function(from, to){
     equal(from, 'alpha');
     equal(to, 'beta');
-
-    ok(transitionShouldBeCalled);
   });
 
-  transitionShouldBeCalled = true;
   machine.transitionTo('beta')
-
-  transitionShouldBeCalled = true;
   machine.transitionTo('alpha')
 });
 
 test('fuzzy match simple', function(){
-  expect(3);
+  expect(2);
   var machine = buildMachine();
 
   machine.beforeTransition({from: 'al*', to: 'beta'}, function(from, to){
     equal(from, 'alpha');
     equal(to, 'beta');
-
-    ok(transitionShouldBeCalled);
   });
 
-  transitionShouldBeCalled = true;
-  machine.transitionTo('beta')
-
-  transitionShouldBeCalled = true;
-  machine.transitionTo('alpha')
+  machine.transitionTo('beta');
+  machine.transitionTo('alpha');
 });
 
 test('fuzzy match more complex', function(){
@@ -280,13 +270,37 @@ test('fuzzy match more complex', function(){
     transitionWasCalled = true;
   });
 
-  transitionShouldBeCalled = true;
   machine.transitionTo('alpha');
 
   ok(!transitionWasCalled, 'the transition should not have been called');
   equal(machine.currentStateName, 'alpha');
 });
 
+test('negated match simple', function() {
+  expect(2);
+  var machine = buildMachine();
+
+  machine.beforeTransition({ from: 'alpha', to: '!alpha'}, function(from, to){
+    equal(from, 'alpha');
+    equal(to, 'beta');
+  });
+
+  machine.transitionTo('beta');
+  machine.transitionTo('alpha');
+});
+
+test('negated match more complex', function() {
+  expect(2);
+  var machine = buildMachine();
+
+  machine.beforeTransition({ from: '*', to: '!alpha'}, function(from, to){
+    equal(from, 'alpha');
+    equal(to, 'beta');
+  });
+
+  machine.transitionTo('beta');
+  machine.transitionTo('alpha');
+});
 
 test('DSL', function(){
   expect(4);
