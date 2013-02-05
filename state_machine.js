@@ -86,6 +86,10 @@ if ( !Array.prototype.forEach ) {
 var a_slice = Array.prototype.slice;
 var o_keys = Object.keys;
 
+function isObject(entity){
+  return entity.constructor === Object;
+}
+
 function compileStates(states){
   var result = {}, nestedResult, entry,
   nestedEntry, keys;
@@ -97,7 +101,7 @@ function compileStates(states){
   o_keys(states).forEach(function(key,b){
     entry = states[key];
 
-    if (entry.constructor === Object){
+    if (isObject(entry)) {
       keys = o_keys(entry);
 
       if(keys.length === 0){
@@ -106,7 +110,7 @@ function compileStates(states){
         keys.forEach(function(nestedKey){
           nestedEntry = entry[nestedKey];
 
-          if (nestedEntry.constructor === Object){
+          if (isObject(nestedEntry)) {
             // recursion bro
             result[ key + '.' + nestedKey] = nestedEntry;
           }else{
