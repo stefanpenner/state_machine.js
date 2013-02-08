@@ -231,13 +231,28 @@ test("unhandledEvent", function(){
 
 module('.beforeTransition');
 
-test('exact match', function(){
+test('context', function(){
   expect(2);
+  var machine = buildMachine(),
+  child = Object.create(machine);
+
+  machine.beforeTransition({ from: 'alpha', to: 'beta'}, function(from, to){
+    notEqual(this, machine);
+    equal(this, child);
+  });
+
+  child.transitionTo('beta')
+  child.transitionTo('alpha')
+});
+
+test('exact match', function(){
+  expect(3);
   var machine = buildMachine();
 
   machine.beforeTransition({ from: 'alpha', to: 'beta'}, function(from, to){
     equal(from, 'alpha');
     equal(to, 'beta');
+    equal(this, machine);
   });
 
   machine.transitionTo('beta')
@@ -245,12 +260,13 @@ test('exact match', function(){
 });
 
 test('fuzzy match simple', function(){
-  expect(2);
+  expect(3);
   var machine = buildMachine();
 
   machine.beforeTransition({from: 'al*', to: 'beta'}, function(from, to){
     equal(from, 'alpha');
     equal(to, 'beta');
+    equal(this, machine);
   });
 
   machine.transitionTo('beta');

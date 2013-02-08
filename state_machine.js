@@ -257,7 +257,7 @@ StateMachine.prototype = {
       fromMatches = (currentMatcherFrom === matchingFrom) !== negatedMatchingFrom;
 
       if (toMatches && fromMatches) {
-        fn.call(context, currentFrom, currentTo);
+        fn.call(this, currentFrom, currentTo);
       }
     });
   },
