@@ -171,7 +171,7 @@ StateMachine.transitionTo = function(state){
 
 StateMachine.prototype = {
   toString: function(){
-    return "<StateMachine currentState='"+this.currentStateName+"'>";
+    return "<StateMachine currentState:'" + this.currentStateName + "' >";
   },
 
   transitionTo: function(nextStateName){

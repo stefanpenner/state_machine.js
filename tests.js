@@ -43,9 +43,9 @@ test("has state", function() {
 
 test("stringify", function(){
   var machine = buildMachine();
-  equal(machine.toString(), "<StateMachine currentState='alpha'>");
+  equal(machine.toString(), "<StateMachine currentState:'alpha' >");
   machine.transitionTo('beta');
-  equal(machine.toString(), "<StateMachine currentState='beta'>");
+  equal(machine.toString(), "<StateMachine currentState:'beta' >");
 });
 
 test("transitions to existing root state", function(){
