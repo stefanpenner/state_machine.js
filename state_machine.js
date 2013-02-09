@@ -170,8 +170,11 @@ StateMachine.transitionTo = function(state){
 };
 
 StateMachine.prototype = {
-  transitionTo: function(nextStateName){
+  toString: function(){
+    return "<StateMachine currentState='"+this.currentStateName+"'>";
+  },
 
+  transitionTo: function(nextStateName){
     if (nextStateName.charAt(0) === '.') {
       var splits = this.currentStateName.split('.').slice(0,-1);
 
