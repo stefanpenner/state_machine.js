@@ -86,6 +86,16 @@ if ( !Array.prototype.forEach ) {
 var a_slice = Array.prototype.slice;
 var o_keys = Object.keys;
 
+function makeArray(entry){
+  if (entry.constructor === Array) {
+    return entry;
+  }else if(entry) {
+    return [entry];
+  }else{
+    return [];
+  }
+}
+
 function StateMachine(options){
   var initialState = options.initialState;
   this.states = options.states;
@@ -262,23 +272,43 @@ StateMachine.prototype = {
   },
 
   send: function(eventName) {
-    var event = this.state[eventName],
-    args = a_slice.call(arguments,1);
+    var event = this.state[eventName];
+    args = a_slice.call(arguments, 1);
 
     if (event) {
       return event.apply(this, args);
-    }else{
+    } else {
       this.unhandledEvent(eventName);
     }
   },
 
   trySend: function(eventName) {
-    var event = this.state[eventName],
+    var event = this.state[eventName];
     args = a_slice.call(arguments,1);
 
     if (event) {
       return event.apply(this, args);
     }
+  },
+
+  event: function(eventName, callback){
+    var states = this.states;
+
+    var eventApi = {
+      transition: function() {
+        var length = arguments.length,
+        first = arguments[0],
+        second = arguments[1],
+        events = normalizeEvents(eventName, first, second);
+
+        o_keys(events).forEach(function(from){
+          var to = events[from];
+          compileEvent(states, eventName, from, to, SM.transitionTo(to));
+        });
+      }
+    };
+
+    callback.call(eventApi);
   },
 
   unhandledEvent: function(event){
@@ -288,3 +318,39 @@ StateMachine.prototype = {
     throw new Error(message);
   }
 };
+
+function normalizeEvents(eventName, first, second){
+  var events;
+  if (!first) { throw new Error('invalid Transition'); }
+
+  if (second) {
+    var froms = first, to = second;
+    events = expandArrayEvents(froms, to);
+  } else {
+    if (first.constructor === Object) {
+      events = first;
+    } else {
+      throw new Error('something went wrong');
+    }
+  }
+
+  return events;
+}
+
+function expandArrayEvents(froms, to){
+  return  makeArray(froms).reduce(function(events, from){
+     events[from] = to;
+     return events;
+   }, {});
+}
+
+function compileEvent(states, eventName, from, to, fn){
+  var state = states[from];
+
+  if (from && to && state) {
+    states[from][eventName] = fn;
+  } else {
+    var message = "invalid transition state: " + (state && state.currentStateName) + " from: " + from+ " to: " + to ;
+    throw new Error(message);
+  }
+}

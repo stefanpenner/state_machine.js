@@ -15,6 +15,9 @@ function buildMachine(){
           return 'hi from ' + from;
         }
       },
+      zeta: {
+
+      },
 
       'gamma.ready': {
       },
@@ -446,7 +449,7 @@ module('integration',{
           openAuthDialog: function(){ authPopup.send('welcomBack'); }
         },
 
-        hasFacebookConnected:{
+        hasEmailAuthenticated:{
           openAuthDialog: function(){ authPopup.send('logInViaFacebook'); }
         },
 
@@ -505,3 +508,49 @@ test("userState.send('openAuthDialog') puts the authPopup in the correct state",
   equal(signingUpViaEmailIsOpen, true, 'signingUpViaEmail is active');
 });
 
+module('.event');
+
+test('simple event-transition', function(){
+  expect(3);
+  var machine = buildMachine();
+
+  equal(machine.currentStateName, 'alpha');
+
+  machine.event('betafiy', function(){
+    this.transition('alpha', 'beta');
+  });
+
+  equal(machine.currentStateName, 'alpha');
+  machine.send('betafiy');
+  equal(machine.currentStateName, 'beta');
+});
+
+test('many from to one event-transition', function(){
+  expect(3);
+  var machine = buildMachine();
+
+  equal(machine.currentStateName, 'alpha');
+
+  machine.event('betafiy', function(){
+    this.transition(['alpha', 'zeta'], 'beta');
+  });
+
+  equal(machine.currentStateName, 'alpha');
+  machine.send('betafiy');
+  equal(machine.currentStateName, 'beta');
+});
+
+test('simple hash event-transition', function(){
+  expect(3);
+  var machine = buildMachine();
+
+  equal(machine.currentStateName, 'alpha');
+
+  machine.event('betafiy', function(){
+    this.transition({alpha: 'beta'});
+  });
+
+  equal(machine.currentStateName, 'alpha');
+  machine.send('betafiy');
+  equal(machine.currentStateName, 'beta');
+});
