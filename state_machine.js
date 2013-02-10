@@ -86,46 +86,9 @@ if ( !Array.prototype.forEach ) {
 var a_slice = Array.prototype.slice;
 var o_keys = Object.keys;
 
-function compileStates(states){
-  var result = {}, nestedResult, entry,
-  nestedEntry, keys;
-
-  if (!states) {
-    return result;
-  }
-
-  o_keys(states).forEach(function(key,b){
-    entry = states[key];
-
-    if (entry.constructor === Object){
-      keys = o_keys(entry);
-
-      if(keys.length === 0){
-        result[key] = entry;
-      }else{
-        keys.forEach(function(nestedKey){
-          nestedEntry = entry[nestedKey];
-
-          if (nestedEntry.constructor === Object){
-            // recursion bro
-            result[ key + '.' + nestedKey] = nestedEntry;
-          }else{
-            result[key] = result[key] || {};
-            result[key][nestedKey] = nestedEntry;
-          }
-        });
-      }
-    }else{
-      result[key] = entry;
-    }
-  })
-
-  return result;
-}
-
 function StateMachine(options){
   var initialState = options.initialState;
-  this.states = compileStates(options.states);
+  this.states = options.states;
 
   if (!this.states) {
     throw new Error('StateMachine needs states');
@@ -158,7 +121,6 @@ function StateMachine(options){
 
 SM = StateMachine;
 StateMachine.SPLAT = SPLAT = '*';
-StateMachine._compileStates = compileStates;
 
 window.StateMachine = StateMachine;
 
@@ -170,6 +132,7 @@ StateMachine.transitionTo = function(state){
 };
 
 StateMachine.prototype = {
+  states: {},
   toString: function(){
     return "<StateMachine currentState:'" + this.currentStateName +"' >";
   },
