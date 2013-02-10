@@ -220,7 +220,7 @@ test("no unhandledEvent", function(){
   throws(function(){
     machine.send('unknownEventName')
   }, function(error){
-    return error.message === "Unknown Event: `unknownEventName` for state: `alpha`";
+    return error.message === "Unknown Event: `unknownEventName` for: <StateMachine currentState:'alpha' >";
   }, "throws an error");
 });
 

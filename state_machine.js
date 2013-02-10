@@ -171,7 +171,7 @@ StateMachine.transitionTo = function(state){
 
 StateMachine.prototype = {
   toString: function(){
-    return "<StateMachine currentState:'" + this.currentStateName + "' >";
+    return "<StateMachine currentState:'" + this.currentStateName +"' >";
   },
 
   transitionTo: function(nextStateName){
@@ -319,7 +319,9 @@ StateMachine.prototype = {
   },
 
   unhandledEvent: function(event){
-    var currentStateName = this.currentStateName;
-    throw new Error("Unknown Event: `" + event + "` for state: `" + currentStateName + "`");
+    var currentStateName = this.currentStateName,
+    message = "Unknown Event: `" + event + "` for: " + this.toString();
+
+    throw new Error(message);
   }
 };
