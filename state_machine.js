@@ -266,14 +266,14 @@ StateMachine.prototype = {
       if (idx) {
         this._subscriptions[event].splice(idx, 1);
       }
-    }else {
+    } else {
       this._subscriptions[event] = null;
     }
   },
 
   send: function(eventName) {
-    var event = this.state[eventName];
-    args = a_slice.call(arguments, 1);
+    var event = this.state[eventName],
+        args = a_slice.call(arguments, 1);
 
     if (event) {
       return event.apply(this, args);
@@ -283,8 +283,8 @@ StateMachine.prototype = {
   },
 
   trySend: function(eventName) {
-    var event = this.state[eventName];
-    args = a_slice.call(arguments,1);
+    var event = this.state[eventName],
+        args = a_slice.call(arguments,1);
 
     if (event) {
       return event.apply(this, args);
@@ -303,7 +303,7 @@ StateMachine.prototype = {
 
         o_keys(events).forEach(function(from){
           var to = events[from];
-          compileEvent(states, eventName, from, to, SM.transitionTo(to));
+          compileEvent(states, eventName, from, to, StateMachine.transitionTo(to));
         });
       }
     };
